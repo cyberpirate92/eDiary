@@ -2,10 +2,16 @@ package eDiary;
 
 class CryptUtil {
 	static String encrypt(String key, String plainText) {
+		
+		char appendChar;
+		if(plainText.length() % 2 == 0)
+			appendChar = '*';
+		else
+			appendChar = '-';
 		String cipherText = "";
 		int count = 0;
 		int[][] keyMat = new int[2][2];
-		int[][][] plainTextMat = new int[(int)Math.ceil(plainText.length()/2)][2][1];
+		int[][][] plainTextMat = new int[(int)(Math.ceil(plainText.length()/2F))][2][1];
 		
 		key = key.toLowerCase();
 		plainText = plainText.toLowerCase();
@@ -19,8 +25,12 @@ class CryptUtil {
 		count = 0;
 		for(int i=0; i<plainTextMat.length; i++)
 			for(int j=0; j<plainTextMat[i].length; j++)
-				for(int k=0; k<plainTextMat[i][j].length; k++, count++)
-					plainTextMat[i][j][k] = plainText.charAt(count) - 'a';
+				for(int k=0; k<plainTextMat[i][j].length; k++, count++) {
+					if(count < plainText.length() && plainText.charAt(count) >= 'a' && plainText.charAt(count) <= 'z')
+						plainTextMat[i][j][k] = plainText.charAt(count) - 'a';
+					else
+						plainTextMat[i][j][k] = ' ';
+				}
 		
 		// multiplying each column vector of plainText with key matrix
 		for(int i=0; i<plainTextMat.length; i++) {
@@ -38,14 +48,16 @@ class CryptUtil {
 					cipherText += (char)(resultant[j][k] + 'a') + "";
 		}
 		
-		return cipherText;
+		return cipherText + appendChar;
 	}
 	
 	static String decrypt(String key, String cipherText) throws Exception {
+		char appendChar = cipherText.charAt(cipherText.length()-1);
+		cipherText = cipherText.substring(0, cipherText.length()-1);
 		String plainText = "";
 		int count = 0;
 		int[][] keyMat = new int[2][2];
-		int[][][] cipherTextMat = new int[(int)Math.ceil(cipherText.length()/2)][2][1];
+		int[][][] cipherTextMat = new int[(int)Math.ceil(cipherText.length()/2F)][2][1];
 		
 		// populating key matrix
 		for(int i=0; i<keyMat.length; i++)
@@ -56,8 +68,12 @@ class CryptUtil {
 		count = 0;
 		for(int i=0; i<cipherTextMat.length; i++)
 			for(int j=0; j<cipherTextMat[i].length; j++)
-				for(int k=0; k<cipherTextMat[i][j].length; k++, count++)
-					cipherTextMat[i][j][k] = cipherText.charAt(count) - 'a';
+				for(int k=0; k<cipherTextMat[i][j].length; k++, count++) {
+					if(count < cipherText.length())
+						cipherTextMat[i][j][k] = cipherText.charAt(count) - 'a';
+					else
+						cipherTextMat[i][j][k] = 0;
+				}
 		
 		// calculating the determinant of keyMat
 		int det = normalize(calculateDeterminant(keyMat));
@@ -78,8 +94,10 @@ class CryptUtil {
 				for(int k=0; k<resultant[j].length; k++)
 					plainText += (char)(resultant[j][k] + 'a') + "";
 		}
-	
-		return plainText;
+		if(appendChar == '-')
+			return plainText.substring(0, plainText.length()-1);
+		else
+			return plainText;
 	}
 	
 	// utility function to normalize a integer value to the range 0-25
