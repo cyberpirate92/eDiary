@@ -9,6 +9,9 @@ class DatabaseUtil {
 	private final String DB_PASSWORD;
 	private final String DB_HOST;
 	private final int DB_PORT;
+	
+	private final String LOGIN_TABLE;
+	
 	private Connection connection;
 	private Statement statement;
 	private ResultSet resultSet;
@@ -19,6 +22,7 @@ class DatabaseUtil {
 		this.DB_USERNAME = username;
 		this.DB_PASSWORD = password;
 		this.DB_NAME = dbName;
+		this.LOGIN_TABLE = "users";
 		this.resultSet = null;
 	}
 	
@@ -51,6 +55,16 @@ class DatabaseUtil {
 			statement.close();
 		if(resultSet != null)
 			resultSet.close();
+	}
+	
+	boolean validateLogin(String username, String password) throws SQLException {
+		boolean loginSuccess = false;
+		ResultSet resultSet = runSQL("SELECT COUNT(*) FROM users WHERE username='"+username+"' AND password='"+password+"'");
+		while(resultSet.next())
+			if(resultSet.getInt(1) > 0)
+				loginSuccess = true;
+		closeConnection();
+		return loginSuccess;
 	}
 	
 	public void debug() throws SQLException {

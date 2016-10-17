@@ -23,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -31,12 +32,13 @@ import javax.swing.border.Border;
 
 class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusListener {
 
-	JPanel topPanel, centerPanel, bottomPanel;
-	JTextField usernameField;
-	JPasswordField passwordField;
-	JButton submitBtn, forgotPasswordBtn, registerBtn;
-	Border defaultBorder, highlightedBorder;
-	Font defaultFont;
+	private JPanel topPanel, centerPanel, bottomPanel;
+	private JTextField usernameField;
+	private JPasswordField passwordField;
+	private JButton submitBtn, forgotPasswordBtn, registerBtn;
+	private Border defaultBorder, highlightedBorder;
+	private Font defaultFont;
+	private DatabaseUtil dbUtil;
 	
 	public DiaryGUI() {
 		super("Diary");
@@ -53,6 +55,8 @@ class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusLis
 		submitBtn = new JButton("Login");
 		forgotPasswordBtn = new JButton("<HTML><U>Forgot Password</U></HTML>");
 		registerBtn = new JButton("Register");
+		
+		dbUtil = new DatabaseUtil("localhost", 3306, "root", "", "ediary");
 		
 		registerEventListeners();
 		setFonts();
@@ -167,7 +171,20 @@ class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusLis
 	public void actionPerformed(ActionEvent e) {
 		JButton sourceBtn = (JButton) e.getSource();
 		if(sourceBtn.equals(submitBtn)) {
-			System.out.println("Submit Button");
+			try {
+				String username = usernameField.getText().trim();
+				String password = passwordField.getText().trim();
+				if (dbUtil.validateLogin(username, password)) {
+					JOptionPane.showMessageDialog(null, "Login successful");
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Sorry, Invalid username/password.");
+				}
+			}
+			catch(Exception sqlEx) {
+				JOptionPane.showMessageDialog(null, "Error: Unhandled exception occured.\nPlease try after again.");
+				sqlEx.printStackTrace();
+			}
 		}
 		else if(sourceBtn.equals(forgotPasswordBtn)) {
 			System.out.println("Forgot Password Button");
