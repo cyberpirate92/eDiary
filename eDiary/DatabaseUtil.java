@@ -2,29 +2,51 @@ package eDiary;
 
 import java.sql.*;
 
-
 public class DatabaseUtil {
-	public DatabaseUtil() {
-		
+	
+	private final String DB_NAME;
+	private final String DB_USERNAME;
+	private final String DB_PASSWORD;
+	private final String DB_HOST;
+	private final int DB_PORT;
+	
+	public DatabaseUtil(String host, int port, String username, String password, String dbName) {
+		this.DB_HOST = host;
+		this.DB_PORT = port;
+		this.DB_USERNAME = username;
+		this.DB_PASSWORD = password;
+		this.DB_NAME = dbName;
 	}
 	
-	public void displayAll() {
-		
+	private Connection getConnection() throws SQLException { 
+		return DriverManager.getConnection(getConnectionString(), DB_USERNAME, DB_PASSWORD);
 	}
 	
-	public static void debug() {
-		try{
+	private String getConnectionString() {
+		return "jdbc:mysql://"+DB_HOST+":"+DB_PORT+"/"+DB_NAME;
+	}
+	
+	private ResultSet runSQL(String sql) {
+		ResultSet resultSet = null;
+		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/sample", "root", "fCTeh8hqcO*:");
+			Connection con = this.getConnection();
 			Statement statement = con.createStatement();
-			ResultSet resultSet = statement.executeQuery("SELECT * from test");
-			while(resultSet.next()) {
-				System.out.println(resultSet.getInt(1));
-			}
+			resultSet = statement.executeQuery(sql);
 			con.close();
 		}
 		catch(Exception e) {
-			System.out.println(e);
+			System.out.println("Error!");
+			e.printStackTrace();
+		}
+		return resultSet;
+	}
+	
+	public void debug() throws SQLException {
+		ResultSet resultSet = runSQL("SELECT * from test");
+		if(resultSet != null)
+			while(resultSet.next()) {
+				System.out.println(resultSet.getInt(1));
 		}
 	}
 }
