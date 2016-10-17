@@ -2,13 +2,16 @@ package eDiary;
 
 import java.sql.*;
 
-public class DatabaseUtil {
+class DatabaseUtil {
 	
 	private final String DB_NAME;
 	private final String DB_USERNAME;
 	private final String DB_PASSWORD;
 	private final String DB_HOST;
 	private final int DB_PORT;
+	private Connection connection;
+	private Statement statement;
+	private ResultSet resultSet;
 	
 	public DatabaseUtil(String host, int port, String username, String password, String dbName) {
 		this.DB_HOST = host;
@@ -16,6 +19,7 @@ public class DatabaseUtil {
 		this.DB_USERNAME = username;
 		this.DB_PASSWORD = password;
 		this.DB_NAME = dbName;
+		this.resultSet = null;
 	}
 	
 	private Connection getConnection() throws SQLException { 
@@ -27,13 +31,11 @@ public class DatabaseUtil {
 	}
 	
 	private ResultSet runSQL(String sql) {
-		ResultSet resultSet = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = this.getConnection();
-			Statement statement = con.createStatement();
+			connection = this.getConnection();
+			statement = connection.createStatement();
 			resultSet = statement.executeQuery(sql);
-			con.close();
 		}
 		catch(Exception e) {
 			System.out.println("Error!");
@@ -42,11 +44,21 @@ public class DatabaseUtil {
 		return resultSet;
 	}
 	
+	private void closeConnection() throws SQLException{
+		if(connection != null)
+			connection.close();
+		if(statement != null)
+			statement.close();
+		if(resultSet != null)
+			resultSet.close();
+	}
+	
 	public void debug() throws SQLException {
 		ResultSet resultSet = runSQL("SELECT * from test");
 		if(resultSet != null)
 			while(resultSet.next()) {
-				System.out.println(resultSet.getInt(1));
+				System.out.println(resultSet.getString(2));
 		}
+		closeConnection();
 	}
 }
