@@ -36,12 +36,12 @@ class CryptUtil {
 		for(int i=0; i<plainTextMat.length; i++) {
 			int[][] resultant = normalize(multiply(keyMat, plainTextMat[i]));
 			
-			System.out.println("Key");
+			/*System.out.println("Key");
 			display(keyMat);
 			System.out.println("Column Vector : "+i);
 			display(plainTextMat[i]);
 			System.out.println("Resultant Matrix, ");
-			display(resultant);
+			display(resultant);*/
 			
 			for(int j=0; j<resultant.length; j++)
 				for(int k=0; k<resultant[j].length; k++)

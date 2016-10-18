@@ -173,7 +173,7 @@ class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusLis
 		if(sourceBtn.equals(submitBtn)) {
 			try {
 				String username = usernameField.getText().trim();
-				String password = passwordField.getText().trim();
+				String password = new String(passwordField.getPassword()).trim();
 				if (dbUtil.validateLogin(username, password)) {
 					JOptionPane.showMessageDialog(null, "Login successful");
 				}
