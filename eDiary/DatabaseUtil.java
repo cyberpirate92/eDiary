@@ -78,6 +78,16 @@ class DatabaseUtil {
 		return loginSuccess;
 	}
 	
+	User getUser(String username) throws SQLException {
+		User user = null;
+		String sql = "SELECT username, password, question, answer, enckey FROM "+LOGIN_TABLE+" WHERE username='" + username + "'";
+		runSQLQuery(sql);
+		while(resultSet.next()) {
+			user = new User(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5));
+		}
+		return user;
+	}
+	
 	private String getEncryptionKey(String username) throws SQLException {
 		String encryptionKey = null;
 		String sql = "SELECT enckey FROM "+LOGIN_TABLE+" WHERE username='"+username+"'";

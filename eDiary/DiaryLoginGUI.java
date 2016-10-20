@@ -167,7 +167,8 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 				String username = usernameField.getText().trim();
 				String password = new String(passwordField.getPassword()).trim();
 				if (dbUtil.validateLogin(username, password)) {
-					JOptionPane.showMessageDialog(null, "Login successful");
+					this.dispose();
+					new DiaryEntryGUI(dbUtil.getUser(username));
 				}
 				else {
 					JOptionPane.showMessageDialog(null, "Sorry, Invalid username/password.");
