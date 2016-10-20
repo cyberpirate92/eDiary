@@ -2,12 +2,12 @@ package eDiary;
 
 import javax.swing.SwingUtilities;
 
-public class TestDiaryGUI {
+public class TestDiaryLoginGUI {
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable(){
 			public void run() {
-				new DiaryGUI();
+				new DiaryLoginGUI();
 			}
 		});
 

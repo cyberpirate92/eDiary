@@ -30,7 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
-class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusListener {
+class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, FocusListener {
 
 	private JPanel topPanel, centerPanel, bottomPanel;
 	private JTextField usernameField;
@@ -40,10 +40,12 @@ class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusLis
 	private Font defaultFont;
 	private DatabaseUtil dbUtil;
 	
-	public DiaryGUI() {
+	public DiaryLoginGUI() {
 		super("Diary");
 		
-		defaultFont = new Font("monaco", Font.PLAIN, 15);
+		defaultFont = ResourceUtil.getDefaultFont();
+		defaultBorder = ResourceUtil.getDefaultBorder();
+		highlightedBorder = ResourceUtil.getHighlightedBorder();
 		
 		topPanel = new JPanel();
 		centerPanel = new JPanel();
@@ -65,8 +67,6 @@ class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusLis
 	}
 	
 	private void setStyles() {
-		defaultBorder = BorderFactory.createLineBorder(new Color(0,0,255,50), 2);
-		highlightedBorder = BorderFactory.createEtchedBorder(new Color(0,0,255,50), Color.BLACK);
 		forgotPasswordBtn.setBorder(null);
 		forgotPasswordBtn.setForeground(Color.BLUE);
 		forgotPasswordBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -95,9 +95,9 @@ class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusLis
 		JLabel imageLabel = null;
 		
 		formPanel.setLayout(new GridLayout(2,2,5,5));
-		formPanel.add(this.getCenteredLabel("Username"));
+		formPanel.add(ResourceUtil.getCenteredLabel("Username"));
 		formPanel.add(usernameField);
-		formPanel.add(this.getCenteredLabel("Password"));
+		formPanel.add(ResourceUtil.getCenteredLabel("Password"));
 		formPanel.add(passwordField);
 		
 		buttonTopPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -149,14 +149,6 @@ class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusLis
 		return image;
 	}
 	
-	private JLabel getCenteredLabel(String text) {
-		JLabel label = new JLabel();
-		label.setText(text);
-		label.setHorizontalAlignment(SwingConstants.CENTER);
-		label.setFont(defaultFont);
-		return label;
-	}
-	
 	private void registerEventListeners() {
 		submitBtn.addActionListener(this);
 		forgotPasswordBtn.addActionListener(this);
@@ -190,7 +182,8 @@ class DiaryGUI extends JFrame implements ActionListener, MouseListener, FocusLis
 			System.out.println("Forgot Password Button");
 		}
 		else if(sourceBtn.equals(registerBtn)) {
-			System.out.println("Register Button");
+			this.dispose();
+			new DiaryRegistrationGUI();
 		}
 	}
 	
