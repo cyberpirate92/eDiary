@@ -140,4 +140,20 @@ class DatabaseUtil {
 		}
 		return entry;
 	}
+	
+	void addNewUser(User newUser) throws SQLException {
+		String u, p, q, a, k;
+		
+		u = newUser.getUsername();
+		p = newUser.getPassword();
+		q = newUser.getQuestion();
+		a = newUser.getAnswer();
+		k = newUser.getEncryptionKey();
+		
+		String sql = "INSERT INTO "+this.LOGIN_TABLE+
+				" (username, password, question, answer, enckey) VALUES" +
+				"('"+u+"', '"+p+"', '"+q+"', '"+a+"', '"+k+"')";
+		
+		runSQLQuery(sql);
+	}
 }

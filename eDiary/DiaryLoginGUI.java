@@ -223,7 +223,7 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 		JTextField field = (JTextField) e.getSource();
 		if(field != null) {
 			field.setBorder(highlightedBorder);
-			field.setBackground(new Color(255,255,255,200));
+			field.setBackground(ResourceUtil.getHighlightBackground());
 		}
 	}
 
@@ -232,7 +232,7 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 		JTextField field = (JTextField) e.getSource();
 		if(field != null) { 
 			field.setBorder(defaultBorder);
-			field.setBackground(Color.WHITE);
+			field.setBackground(ResourceUtil.getDefaultBackground());
 		}
 	}
 
