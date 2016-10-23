@@ -11,7 +11,7 @@ public class TestDatabaseUtil {
 		Calendar temp = Calendar.getInstance();
 		dbUtil.saveJournalEntry("theja", "shortexample", temp);
 		JournalEntry entry = dbUtil.getJournalEntry("theja", temp);
-		if(entry.getEntry() != null)
+		if(entry != null && entry.getEntry() != null)
 			System.out.println("Entry says '" + entry.getEntry() +"'");
 		else
 			System.out.println("Entry null");

@@ -39,6 +39,7 @@ class DatabaseUtil {
 	
 	private void runSQLQuery(String sql) throws SQLException {
 		try {
+			System.out.println("SQL> " + sql);
 			closeConnection();
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = this.getConnection();
@@ -114,8 +115,9 @@ class DatabaseUtil {
 			long currentTime = System.currentTimeMillis(), entryTime = entryDate.getTimeInMillis();
 			
 			// pushing cipher to database
-			String sql = "INSERT INTO "+ENTRIES_TABLE+" (username, entry, entry_date, last_edited) "
-					+ "VALUES ('"+username+"', '"+cipherText+"', "+entryTime+", "+currentTime+")";
+			String entryDay = entryDate.get(Calendar.YEAR) + "-" + entryDate.get(Calendar.MONTH) + "-" + entryDate.get(Calendar.DAY_OF_MONTH);
+			String sql = "INSERT INTO "+ENTRIES_TABLE+" (username, entry, entry_date, last_edited, entry_day) "
+					+ "VALUES ('"+username+"', '"+cipherText+"', "+entryTime+", "+currentTime+", '"+entryDay+"')";
 			runSQLQuery(sql);
 			closeConnection();
 		}
@@ -133,19 +135,25 @@ class DatabaseUtil {
 			Calendar lastEdited = Calendar.getInstance();
 			
 			// retrieving the cipher text from table
+			String entryDay = entryDate.get(Calendar.YEAR) + "-" + entryDate.get(Calendar.MONTH) + "-" + entryDate.get(Calendar.DAY_OF_MONTH);
 			String sql = "SELECT entry, last_edited FROM entries "
-					+ "WHERE username='"+username+"' AND entry_date="+entryDate.getTimeInMillis();
+					+ "WHERE username='"+username+"' AND entry_day='"+entryDay+"'";
 			runSQLQuery(sql);
 			if(resultSet != null) {
 				while(resultSet.next()) {
 					cipherText = resultSet.getString(1);
 					lastEdited.setTimeInMillis(resultSet.getLong(2));
+					
+					System.out.println("Cipher Text: "+cipherText);
 				}
 				if(cipherText != null) { 
 					String plainText = CryptUtil.decrypt(encryptionKey, cipherText);
 					entry = new JournalEntry(plainText, entryDate, lastEdited);
 					System.out.println("Plain Text : "+ plainText);
 				}
+			}
+			else {
+				System.out.println("Result set null");
 			}
 		}
 		return entry;
