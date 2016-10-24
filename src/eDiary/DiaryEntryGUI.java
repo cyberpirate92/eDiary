@@ -5,13 +5,23 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Properties;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
 
 public class DiaryEntryGUI extends JFrame implements ActionListener {
 	
@@ -19,8 +29,10 @@ public class DiaryEntryGUI extends JFrame implements ActionListener {
 	private User currentUser;
 	private JTextArea entryArea;
 	private DatabaseUtil dbUtil;
-	private JButton saveButton, clearButton;
+	private JButton saveButton, clearButton, logoutButton;
 	private JButton boldButton, italicsButton, underlineButton;
+	private JDatePickerImpl datePicker;
+	private JLabel currentDateLabel;
 	
 	DiaryEntryGUI(User user) {
 		
@@ -38,9 +50,13 @@ public class DiaryEntryGUI extends JFrame implements ActionListener {
 		boldButton = new JButton("<html><b>B</b></html>");
 		italicsButton = new JButton("<html><i>I</i></html>");
 		underlineButton = new JButton("<html><u>U</u></html>");
+		logoutButton = new JButton("Logout");
+		currentDateLabel = ResourceUtil.getCenteredLabel("");
+		datePicker = new JDatePickerImpl(new JDatePanelImpl(getUtilDateModel(), new Properties()), null);
 		
 		registerEventListeners();
 		initializeLayout();
+		updateCurrentDateLabel();
 		
 		try {
 			JournalEntry entry = dbUtil.getJournalEntry(currentUser.getUsername(), Calendar.getInstance());
@@ -61,9 +77,34 @@ public class DiaryEntryGUI extends JFrame implements ActionListener {
 		boldButton.addActionListener(this);
 		italicsButton.addActionListener(this);
 		underlineButton.addActionListener(this);
+		logoutButton.addActionListener(this);
+		datePicker.getModel().addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				try {
+					DiaryEntryGUI.this.updateOnDateChanged();
+				}
+				catch(Exception exc) {
+					System.out.println("Exception : ");
+					exc.printStackTrace();
+				}
+			}
+		});
 	}
 	
 	private void initializeLayout() {
+		
+		// LEFT PANEL
+		
+		JPanel calendarPanel = new JPanel();
+		calendarPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		calendarPanel.add(datePicker);
+		
+		leftPanel.setLayout(new BorderLayout());
+		leftPanel.add(ResourceUtil.getCenteredLabel("Welcome, "+currentUser.getUsername()), BorderLayout.NORTH);
+		leftPanel.add(calendarPanel, BorderLayout.CENTER);
+		leftPanel.add(logoutButton, BorderLayout.SOUTH);
+		
+		// CENTER PANEL
 		
 		JPanel buttonPanel = new JPanel();
 		JPanel formattingPanel = new JPanel();
@@ -73,6 +114,7 @@ public class DiaryEntryGUI extends JFrame implements ActionListener {
 		buttonPanel.add(clearButton);
 		
 		formattingPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		formattingPanel.add(currentDateLabel);
 		formattingPanel.add(boldButton);
 		formattingPanel.add(italicsButton);
 		formattingPanel.add(underlineButton);
@@ -93,24 +135,51 @@ public class DiaryEntryGUI extends JFrame implements ActionListener {
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
+	
+	private void updateOnDateChanged() throws Exception {
+		updateCurrentDateLabel();
+		
+		JournalEntry entry = dbUtil.getJournalEntry(currentUser.getUsername(), getCurrentEntryDate());
+		if(entry != null) 
+			entryArea.setText(entry.getEntry());
+		else
+			entryArea.setText("");
+	}
+	
+	private void updateCurrentDateLabel() {
+		currentDateLabel.setText(this.getCurrentEntryDateString());
+	}
+	
+	private UtilDateModel getUtilDateModel() {
+		UtilDateModel model = new UtilDateModel();
+		Calendar c = Calendar.getInstance();
+		model.setDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+		model.setSelected(true);
+		return model;
+	}
+	
+	private Calendar getCurrentEntryDate() {
+		Calendar c = Calendar.getInstance();
+		c.setTime((Date)(datePicker.getModel().getValue()));
+		return c ;
+	}
+	
+	private String getCurrentEntryDateString() {
+		Calendar c = getCurrentEntryDate();
+		String currentDate = c.get(Calendar.DAY_OF_MONTH) + " ";
+		SimpleDateFormat monthName = new SimpleDateFormat("MMMM");
+		currentDate += monthName.format(c.getTime()) + " ";
+		currentDate += c.get(Calendar.YEAR);
+		return currentDate;
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 		JButton srcBtn = (JButton) e.getSource();
-		int start = entryArea.getSelectionStart(), end = entryArea.getSelectionEnd();
+		// int start = entryArea.getSelectionStart(), end = entryArea.getSelectionEnd();
 		
 		if(srcBtn.equals(saveButton)) {
-			String entry = entryArea.getText().trim();
-			if(entry != null && entry.length() > 0) {
-				try {
-					dbUtil.saveJournalEntry(currentUser.getUsername(), entry, Calendar.getInstance());
-				}
-				catch(SQLException ex) {
-					JOptionPane.showMessageDialog(null, "Could not save entry, please try again!");
-					ex.printStackTrace();
-				}
-			}
+			saveJournal();
 		}
 		else if(srcBtn.equals(clearButton)) {
 			
@@ -123,6 +192,31 @@ public class DiaryEntryGUI extends JFrame implements ActionListener {
 		}
 		else if(srcBtn.equals(underlineButton)) {
 			
+		}
+		else if(srcBtn.equals(logoutButton)) {
+			int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to logout ?", "Confirm Logout", JOptionPane.YES_NO_OPTION);
+			if(result == JOptionPane.YES_OPTION) {
+				result = JOptionPane.showConfirmDialog(null, "Save Entry ?", "Confirm Save", JOptionPane.YES_NO_OPTION);
+				if(result != JOptionPane.CANCEL_OPTION) {
+					if(result == JOptionPane.YES_OPTION)
+						saveJournal();
+					this.dispose();
+					new DiaryLoginGUI();
+				}
+			}
+		}
+	}
+	
+	private void saveJournal() {
+		String entry = entryArea.getText().trim();
+		if(entry != null && entry.length() > 0) {
+			try {
+				dbUtil.saveJournalEntry(currentUser.getUsername(), entry, getCurrentEntryDate());
+			}
+			catch(SQLException ex) {
+				JOptionPane.showMessageDialog(null, "Could not save entry, please try again!");
+				ex.printStackTrace();
+			}
 		}
 	}
 }
