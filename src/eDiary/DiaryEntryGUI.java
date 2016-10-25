@@ -129,7 +129,7 @@ public class DiaryEntryGUI extends JFrame implements ActionListener {
 		this.add(centerPanel, BorderLayout.CENTER);
 		this.add(rightPanel, BorderLayout.EAST);
 		
-		this.setSize(400, 400);
+		this.setSize(700, 400);
 		this.setResizable(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);

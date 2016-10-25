@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS `eDiary`.`entries` (
   `entry_date` BIGINT(50) NOT NULL COMMENT 'The date for which this journal entry was created',
   `last_edited` BIGINT(50) NOT NULL COMMENT 'The date at which this entry was last edited',
   `entry_day` DATE NOT NULL,
-  PRIMARY KEY (`ID`),
-  UNIQUE INDEX `entry_day_UNIQUE` (`entry_day` ASC))
+  PRIMARY KEY (`ID`))
 ENGINE = InnoDB
 AUTO_INCREMENT = 5
 DEFAULT CHARACTER SET = latin1
