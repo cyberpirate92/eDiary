@@ -168,7 +168,23 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 			login();
 		}
 		else if(sourceBtn.equals(forgotPasswordBtn)) {
-			System.out.println("Forgot Password Button");
+			String username = usernameField.getText().trim();
+			try {
+				if(username != null && username.length() > 0 && dbUtil.usernameExists(username)) {
+					User user = dbUtil.getUser(username);
+					if(user != null) {
+						this.dispose();
+						new PasswordHelperGUI(user);
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Please enter a valid username to reset password");
+				}
+			}
+			catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			
 		}
 		else if(sourceBtn.equals(registerBtn)) {
 			this.dispose();

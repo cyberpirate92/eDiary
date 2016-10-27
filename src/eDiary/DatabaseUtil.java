@@ -174,4 +174,15 @@ class DatabaseUtil {
 		
 		runSQLQuery(sql);
 	}
+	
+	boolean usernameExists(String username) throws Exception {
+		String sql = "SELECT * FROM "+this.LOGIN_TABLE+" WHERE username='"+username+"'";
+		boolean exists = false;
+		this.runSQLQuery(sql);
+		if(this.resultSet != null && resultSet.next()) {
+				exists = true;
+		}
+		closeConnection();
+		return exists;
+	}
 }
