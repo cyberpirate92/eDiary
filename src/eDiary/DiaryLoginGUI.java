@@ -6,11 +6,12 @@ import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -18,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -27,10 +27,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
-class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, FocusListener {
+class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, FocusListener, KeyListener {
 
 	private JPanel topPanel, centerPanel, bottomPanel;
 	private JTextField usernameField;
@@ -157,27 +156,16 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 		
 		usernameField.addFocusListener(this);
 		passwordField.addFocusListener(this);
+		
+		usernameField.addKeyListener(this);
+		passwordField.addKeyListener(this);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JButton sourceBtn = (JButton) e.getSource();
 		if(sourceBtn.equals(submitBtn)) {
-			try {
-				String username = usernameField.getText().trim();
-				String password = new String(passwordField.getPassword()).trim();
-				if (dbUtil.validateLogin(username, password)) {
-					this.dispose();
-					new DiaryEntryGUI(dbUtil.getUser(username));
-				}
-				else {
-					JOptionPane.showMessageDialog(null, "Sorry, Invalid username/password.");
-				}
-			}
-			catch(Exception sqlEx) {
-				JOptionPane.showMessageDialog(null, "Error: Unhandled exception occured.\nPlease try after again.");
-				sqlEx.printStackTrace();
-			}
+			login();
 		}
 		else if(sourceBtn.equals(forgotPasswordBtn)) {
 			System.out.println("Forgot Password Button");
@@ -193,6 +181,35 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 		JButton button = (JButton) e.getSource();
 		if(button != null) {
 			button.setForeground(Color.RED);
+		}
+	}
+	
+	private boolean isValidForm() {
+		String username = usernameField.getText().trim();
+		String password = new String(passwordField.getPassword()).trim();
+		return (username != null && password != null && username.length() > 0 && password.length() > 0);
+	}
+	
+	private void login() {
+		try {
+			String username = usernameField.getText().trim();
+			String password = new String(passwordField.getPassword()).trim();
+			if(isValidForm()) {
+				if (dbUtil.validateLogin(username, password)) {
+					this.dispose();
+					new DiaryEntryGUI(dbUtil.getUser(username));
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Sorry, Invalid username/password.");
+				}
+			}
+			else {
+				JOptionPane.showMessageDialog(null, "Sorry, Invalid username/password.");
+			}
+		}
+		catch(Exception sqlEx) {
+			JOptionPane.showMessageDialog(null, "Error: Unhandled exception occured.\nPlease try after again.");
+			sqlEx.printStackTrace();
 		}
 	}
 
@@ -235,6 +252,23 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 			field.setBorder(defaultBorder);
 			field.setBackground(ResourceUtil.getDefaultBackground());
 		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_ENTER){
+			login();
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		
 	}
 
 }
