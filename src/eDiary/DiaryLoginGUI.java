@@ -174,7 +174,7 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 					User user = dbUtil.getUser(username);
 					if(user != null) {
 						this.dispose();
-						new PasswordHelperGUI(user);
+						new PasswordHelperGUI(user, dbUtil);
 					}
 				}
 				else {

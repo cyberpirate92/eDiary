@@ -185,4 +185,20 @@ class DatabaseUtil {
 		closeConnection();
 		return exists;
 	}
+	
+	void updateUser(User user) throws SQLException {
+		String u, p, q, a, k;
+		
+		u = user.getUsername();
+		p = user.getPassword();
+		q = user.getQuestion();
+		a = user.getAnswer();
+		k = user.getEncryptionKey();
+		
+		String sql = "UPDATE " + this.LOGIN_TABLE + 
+				" SET password = '" + p + "', question = '" + q + "', answer = '" + a + "', enckey = '" + k +
+				"' WHERE username = '" + u + "'";
+		
+		runSQLQuery(sql);
+	}
 }

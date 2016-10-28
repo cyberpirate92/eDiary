@@ -20,11 +20,17 @@ class PasswordHelperGUI extends JFrame {
 	private JTextField answerField;
 	private JButton resetButton, cancelButton;
 	private User currentUser;
+	private DatabaseUtil dbUtil;
 	
-	PasswordHelperGUI(User user) {
+	PasswordHelperGUI(User user, DatabaseUtil dbUtil) {
 		super("Password Reset");
 		
 		currentUser = user;
+		this.dbUtil = dbUtil;
+		if(this.dbUtil == null) {
+			System.out.println("DatabaseUtil object null");
+			System.exit(0);
+		}
 		
 		centerPanel = new JPanel();
 		bottomPanel = new JPanel();
@@ -74,8 +80,8 @@ class PasswordHelperGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String answer = answerField.getText();
 				if(answer.equals(currentUser.getAnswer())) {
-					//TODO: instantiate password reset class
-					System.out.println("Not yet implemented!");
+					PasswordHelperGUI.this.dispose();
+					new PasswordResetGUI(currentUser, dbUtil);
 				}
 				else
 					JOptionPane.showMessageDialog(null, "Sorry, but that's not the right answer!\nPlease try again");
