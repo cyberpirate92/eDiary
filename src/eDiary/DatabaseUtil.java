@@ -108,16 +108,34 @@ class DatabaseUtil {
 		// retrieving the encryption key of the user
 		String encryptionKey = getEncryptionKey(username);
 		
-		
+		// checking if a entry exists for this user on the same day
+		boolean entryExists = false;
+		String sql = "SELECT COUNT(*) FROM " + this.ENTRIES_TABLE + 
+				" WHERE username = '"+username+"' AND entry_day='"+
+				this.getSQLDateString(entryDate)+"'";
+		runSQLQuery(sql);
+		if(resultSet != null) {
+			if(resultSet.next()) {
+				entryExists = resultSet.getInt(1) != 0;
+			}
+		}
+		closeConnection();
 		if(encryptionKey != null) {
 			// encrypting the journal entry
 			String cipherText = CryptUtil.encrypt(encryptionKey, entry);
 			long currentTime = System.currentTimeMillis(), entryTime = entryDate.getTimeInMillis();
 			
 			// pushing cipher to database
-			String entryDay = entryDate.get(Calendar.YEAR) + "-" + entryDate.get(Calendar.MONTH) + "-" + entryDate.get(Calendar.DAY_OF_MONTH);
-			String sql = "INSERT INTO "+ENTRIES_TABLE+" (username, entry, entry_date, last_edited, entry_day) "
-					+ "VALUES ('"+username+"', '"+cipherText+"', "+entryTime+", "+currentTime+", '"+entryDay+"')";
+			String entryDay = this.getSQLDateString(entryDate);
+			if(!entryExists) {
+				sql = "INSERT INTO "+ENTRIES_TABLE+" (username, entry, entry_date, last_edited, entry_day) "
+						+ "VALUES ('"+username+"', '"+cipherText+"', "+entryTime+", "+currentTime+", '"+entryDay+"')";
+			}
+			else {
+				sql = "UPDATE "+ENTRIES_TABLE+
+						" SET entry='"+cipherText+"', last_edited="+currentTime+
+						" WHERE entry_day='"+entryDay+"' AND username='"+username+"'";
+			}
 			runSQLQuery(sql);
 			closeConnection();
 		}
@@ -200,5 +218,9 @@ class DatabaseUtil {
 				"' WHERE username = '" + u + "'";
 		
 		runSQLQuery(sql);
+	}
+	
+	private String getSQLDateString(Calendar c) {
+		return c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DAY_OF_MONTH); 
 	}
 }
