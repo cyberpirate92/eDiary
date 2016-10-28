@@ -69,7 +69,7 @@ class DatabaseUtil {
 	
 	boolean validateLogin(String username, String password) throws SQLException {
 		boolean loginSuccess = false;
-		runSQLQuery("SELECT COUNT(*) FROM users WHERE username='"+username+"' AND password='"+password+"'");
+		runSQLQuery("SELECT COUNT(*) FROM users WHERE username='"+username+"' AND password='"+CryptUtil.sha256(password)+"'");
 		if(resultSet != null) {
 			while(resultSet.next())
 				if(resultSet.getInt(1) > 0)
@@ -181,7 +181,7 @@ class DatabaseUtil {
 		String u, p, q, a, k;
 		
 		u = newUser.getUsername();
-		p = newUser.getPassword();
+		p = CryptUtil.sha256(newUser.getPassword());
 		q = newUser.getQuestion();
 		a = newUser.getAnswer();
 		k = newUser.getEncryptionKey();
@@ -208,7 +208,7 @@ class DatabaseUtil {
 		String u, p, q, a, k;
 		
 		u = user.getUsername();
-		p = user.getPassword();
+		p = CryptUtil.sha256(user.getPassword());
 		q = user.getQuestion();
 		a = user.getAnswer();
 		k = user.getEncryptionKey();
