@@ -1,12 +1,12 @@
-package eDiary;
+package eDiary.main;
 
 import java.util.Calendar;
 
-class JournalEntry {
-	
+public class JournalEntry {
+
 	private String entry;
 	private Calendar entryDate, lastEdited;
-	
+
 	public JournalEntry(String entry, long entryDateMillis, long lastEditedMillis) {
 		this.entry = entry;
 		this.entryDate = Calendar.getInstance();
@@ -14,7 +14,7 @@ class JournalEntry {
 		this.entryDate.setTimeInMillis(entryDateMillis);
 		this.lastEdited.setTimeInMillis(lastEditedMillis);
 	}
-	
+
 	public JournalEntry(String entry, Calendar entryDate, Calendar lastEdited) {
 		this.entry = entry;
 		this.entryDate = entryDate;

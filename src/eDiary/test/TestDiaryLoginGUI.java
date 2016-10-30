@@ -1,6 +1,7 @@
-package eDiary;
+package eDiary.test;
 
 import javax.swing.SwingUtilities;
+import eDiary.main.DiaryLoginGUI;
 
 public class TestDiaryLoginGUI {
 

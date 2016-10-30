@@ -1,4 +1,4 @@
-package eDiary;
+package eDiary.main;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -13,56 +13,56 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
 class PasswordResetGUI extends JFrame {
-	
+
 	private User currentUser;
 	private JPanel centerPanel, bottomPanel;
 	private JPasswordField passwordField, repasswordField;
 	private JButton submitButton, cancelButton;
 	private DatabaseUtil dbUtil;
-	
+
 	PasswordResetGUI(User user, DatabaseUtil dbUtil) {
-		
+
 		super("Reset Password : " + user.getUsername());
 		currentUser = user;
 		this.dbUtil = dbUtil;
-		
+
 		centerPanel = new JPanel();
 		bottomPanel = new JPanel();
-		
+
 		passwordField = new JPasswordField();
 		repasswordField = new JPasswordField();
-		
+
 		submitButton = new JButton("Change Password");
 		cancelButton = new JButton("Cancel");
-		
+
 		registerEventListeners();
 		initializeLayout();
 	}
-	
+
 	private void initializeLayout() {
-		
+
 		centerPanel.setLayout(new GridLayout(2,2,5,5));
 		centerPanel.add(ResourceUtil.getCenteredLabel("Password"));
 		centerPanel.add(passwordField);
 		centerPanel.add(ResourceUtil.getCenteredLabel("Re-Password"));
 		centerPanel.add(repasswordField);
-		
+
 		bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		bottomPanel.add(submitButton);
 		bottomPanel.add(cancelButton);
-		
+
 		this.setLayout(new BorderLayout());
 		this.add(ResourceUtil.getCenteredLabel("Enter your new password in the fields below"), BorderLayout.NORTH);
 		this.add(centerPanel, BorderLayout.CENTER);
 		this.add(bottomPanel, BorderLayout.SOUTH);
-		
+
 		this.setSize(300, 300);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
 		this.setVisible(true);
 	}
-	
+
 	private void registerEventListeners() {
 		submitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -95,14 +95,14 @@ class PasswordResetGUI extends JFrame {
 				}
 			}
 		});
-		
+
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				PasswordResetGUI.this.navigateToLoginWindow();
 			}
 		});
 	}
-	
+
 	private void navigateToLoginWindow() {
 		PasswordResetGUI.this.dispose();
 		new DiaryLoginGUI();

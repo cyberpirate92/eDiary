@@ -1,8 +1,8 @@
-package eDiary;
+package eDiary.main;
 
-class User {
+public class User {
 	private String username, password, question, answer, encryptionKey;
-	
+
 	User(String username, String password, String question, String answer, String encryptionKey) {
 		super();
 		this.username = username;

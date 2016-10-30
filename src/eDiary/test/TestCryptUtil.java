@@ -1,4 +1,6 @@
-package eDiary;
+package eDiary.test;
+
+import eDiary.main.CryptUtil;
 
 public class TestCryptUtil {
 	public static void main(String[] args) throws Exception {

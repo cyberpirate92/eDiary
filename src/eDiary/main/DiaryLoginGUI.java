@@ -1,4 +1,4 @@
-package eDiary;
+package eDiary.main;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -29,7 +29,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
-class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, FocusListener, KeyListener {
+public class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, FocusListener, KeyListener {
 
 	private JPanel topPanel, centerPanel, bottomPanel;
 	private JTextField usernameField;
@@ -38,33 +38,33 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 	private Border defaultBorder, highlightedBorder;
 	private Font defaultFont;
 	private DatabaseUtil dbUtil;
-	
+
 	public DiaryLoginGUI() {
 		super("Diary");
-		
+
 		defaultFont = ResourceUtil.getDefaultFont();
 		defaultBorder = ResourceUtil.getDefaultBorder();
 		highlightedBorder = ResourceUtil.getHighlightedBorder();
-		
+
 		topPanel = new JPanel();
 		centerPanel = new JPanel();
 		bottomPanel = new JPanel();
-		
+
 		usernameField = new JTextField(10);
 		passwordField = new JPasswordField(10);
-		
+
 		submitBtn = new JButton("Login");
 		forgotPasswordBtn = new JButton("<HTML><U>Forgot Password</U></HTML>");
 		registerBtn = new JButton("Register");
-		
+
 		dbUtil = new DatabaseUtil("localhost", 3306, "root", "", "ediary");
-		
+
 		registerEventListeners();
 		setFonts();
 		setStyles();
 		initializeLayout();
 	}
-	
+
 	private void setStyles() {
 		forgotPasswordBtn.setBorder(null);
 		forgotPasswordBtn.setForeground(Color.BLUE);
@@ -72,56 +72,56 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 		usernameField.setBorder(defaultBorder);
 		passwordField.setBorder(defaultBorder);
 	}
-	
+
 	private void setFonts() {
 		submitBtn.setFont(defaultFont);
 		forgotPasswordBtn.setFont(defaultFont);
 		registerBtn.setFont(defaultFont);
-		
+
 		usernameField.setFont(defaultFont);
 		passwordField.setFont(defaultFont);
 	}
-	
+
 	private void initializeLayout() {
 		topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		//topPanel.add(new JLabel("Login"));
-		
+
 		JPanel formPanel = new JPanel();
 		JPanel buttonPanel = new JPanel();
 		JPanel buttonTopPanel = new JPanel(), buttonBottomPanel = new JPanel();
 		JPanel rightPanel = new JPanel();
 		JPanel imagePanel;
 		JLabel imageLabel = null;
-		
+
 		formPanel.setLayout(new GridLayout(2,2,5,5));
 		formPanel.add(ResourceUtil.getCenteredLabel("Username"));
 		formPanel.add(usernameField);
 		formPanel.add(ResourceUtil.getCenteredLabel("Password"));
 		formPanel.add(passwordField);
-		
+
 		buttonTopPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		buttonTopPanel.add(forgotPasswordBtn);
-		
+
 		buttonBottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		buttonBottomPanel.add(submitBtn);
 		buttonBottomPanel.add(registerBtn);
-		
+
 		buttonPanel.setLayout(new GridLayout(2,1,5,5));
 		buttonPanel.add(buttonBottomPanel);
 		buttonPanel.add(buttonTopPanel);
-		
+
 		rightPanel.setLayout(new BorderLayout());
 		rightPanel.add(new JPanel(), BorderLayout.NORTH);
 		rightPanel.add(formPanel, BorderLayout.CENTER);
 		rightPanel.add(buttonPanel, BorderLayout.SOUTH);
-		
+
 		try {
 			imageLabel = new JLabel(getImageIcon("images/splash.jpg"));
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		centerPanel.setLayout(new GridLayout(1,2,5,5));
 		if(imageLabel != null) {
 			imagePanel = new JPanel();
@@ -130,7 +130,7 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 			centerPanel.add(imagePanel);
 		}
 		centerPanel.add(rightPanel);
-		
+
 		this.setLayout(new BorderLayout());
 		this.add(topPanel, BorderLayout.NORTH);
 		this.add(centerPanel, BorderLayout.CENTER);
@@ -140,27 +140,27 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
 	}
-	
+
 	private ImageIcon getImageIcon(String imagePath) throws IOException {
 		ImageIcon image = null;
 		BufferedImage bufImg = ImageIO.read(new File(imagePath));
-		image = new ImageIcon(bufImg);	
+		image = new ImageIcon(bufImg);
 		return image;
 	}
-	
+
 	private void registerEventListeners() {
 		submitBtn.addActionListener(this);
 		forgotPasswordBtn.addActionListener(this);
 		forgotPasswordBtn.addMouseListener(this);
 		registerBtn.addActionListener(this);
-		
+
 		usernameField.addFocusListener(this);
 		passwordField.addFocusListener(this);
-		
+
 		usernameField.addKeyListener(this);
 		passwordField.addKeyListener(this);
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JButton sourceBtn = (JButton) e.getSource();
@@ -184,14 +184,14 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 			catch(Exception ex) {
 				ex.printStackTrace();
 			}
-			
+
 		}
 		else if(sourceBtn.equals(registerBtn)) {
 			this.dispose();
 			new DiaryRegistrationGUI();
 		}
 	}
-	
+
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		JButton button = (JButton) e.getSource();
@@ -199,13 +199,13 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 			button.setForeground(Color.RED);
 		}
 	}
-	
+
 	private boolean isValidForm() {
 		String username = usernameField.getText().trim();
 		String password = new String(passwordField.getPassword()).trim();
 		return (username != null && password != null && username.length() > 0 && password.length() > 0);
 	}
-	
+
 	private void login() {
 		try {
 			String username = usernameField.getText().trim();
@@ -239,17 +239,17 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
+
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		
+
 	}
 
 	@Override
@@ -264,7 +264,7 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 	@Override
 	public void focusLost(FocusEvent e) {
 		JTextField field = (JTextField) e.getSource();
-		if(field != null) { 
+		if(field != null) {
 			field.setBorder(defaultBorder);
 			field.setBackground(ResourceUtil.getDefaultBackground());
 		}
@@ -272,7 +272,7 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		
+
 	}
 
 	@Override
@@ -284,7 +284,7 @@ class DiaryLoginGUI extends JFrame implements ActionListener, MouseListener, Foc
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		
+
 	}
 
 }

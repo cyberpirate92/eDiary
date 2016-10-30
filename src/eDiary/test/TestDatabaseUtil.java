@@ -1,13 +1,15 @@
-package eDiary;
+package eDiary.test;
 
 import java.util.Calendar;
+import eDiary.main.DatabaseUtil;
+import eDiary.main.JournalEntry;
 
 public class TestDatabaseUtil {
 	public static void main(String[] args) throws Exception {
 		DatabaseUtil dbUtil = new DatabaseUtil("localhost", 3306, "root", "", "ediary");
 		System.out.println("Test 1: " + dbUtil.validateLogin("theja", "theja"));
 		System.out.println("Test 2: " + dbUtil.validateLogin("cyberpirate", "cyberpirate"));
-		
+
 		Calendar temp = Calendar.getInstance();
 		dbUtil.saveJournalEntry("theja", "shortexample", temp);
 		JournalEntry entry = dbUtil.getJournalEntry("theja", temp);

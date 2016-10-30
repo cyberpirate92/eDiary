@@ -1,23 +1,23 @@
-package eDiary;
+package eDiary.main;
 
 import java.sql.*;
 import java.util.Calendar;
 
-class DatabaseUtil {
-	
+public class DatabaseUtil {
+
 	private final String DB_NAME;
 	private final String DB_USERNAME;
 	private final String DB_PASSWORD;
 	private final String DB_HOST;
 	private final int DB_PORT;
-	
+
 	private final String LOGIN_TABLE;
 	private final String ENTRIES_TABLE;
-	
+
 	private Connection connection;
 	private Statement statement;
 	private ResultSet resultSet;
-	
+
 	public DatabaseUtil(String host, int port, String username, String password, String dbName) {
 		this.DB_HOST = host;
 		this.DB_PORT = port;
@@ -28,15 +28,15 @@ class DatabaseUtil {
 		this.ENTRIES_TABLE = "entries";
 		this.resultSet = null;
 	}
-	
-	private Connection getConnection() throws SQLException { 
+
+	private Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(getConnectionString(), DB_USERNAME, DB_PASSWORD);
 	}
-	
+
 	private String getConnectionString() {
 		return "jdbc:mysql://"+DB_HOST+":"+DB_PORT+"/"+DB_NAME;
 	}
-	
+
 	private void runSQLQuery(String sql) throws SQLException {
 		try {
 			System.out.println("SQL> " + sql);
@@ -57,7 +57,7 @@ class DatabaseUtil {
 			closeConnection();
 		}
 	}
-	
+
 	private void closeConnection() throws SQLException{
 		if(connection != null)
 			connection.close();
@@ -66,7 +66,7 @@ class DatabaseUtil {
 		if(resultSet != null)
 			resultSet.close();
 	}
-	
+
 	boolean validateLogin(String username, String password) throws SQLException {
 		boolean loginSuccess = false;
 		runSQLQuery("SELECT COUNT(*) FROM users WHERE username='"+username+"' AND password='"+CryptUtil.sha256(password)+"'");
@@ -78,7 +78,7 @@ class DatabaseUtil {
 		}
 		return loginSuccess;
 	}
-	
+
 	User getUser(String username) throws SQLException {
 		User user = null;
 		String sql = "SELECT username, password, question, answer, enckey FROM "+LOGIN_TABLE+" WHERE username='" + username + "'";
@@ -88,7 +88,7 @@ class DatabaseUtil {
 		}
 		return user;
 	}
-	
+
 	private String getEncryptionKey(String username) throws SQLException {
 		String encryptionKey = null;
 		String sql = "SELECT enckey FROM "+LOGIN_TABLE+" WHERE username='"+username+"'";
@@ -102,15 +102,15 @@ class DatabaseUtil {
 		}
 		return encryptionKey;
 	}
-	
+
 	void saveJournalEntry(String username, String entry, Calendar entryDate) throws SQLException {
-		
+
 		// retrieving the encryption key of the user
 		String encryptionKey = getEncryptionKey(username);
-		
+
 		// checking if a entry exists for this user on the same day
 		boolean entryExists = false;
-		String sql = "SELECT COUNT(*) FROM " + this.ENTRIES_TABLE + 
+		String sql = "SELECT COUNT(*) FROM " + this.ENTRIES_TABLE +
 				" WHERE username = '"+username+"' AND entry_day='"+
 				this.getSQLDateString(entryDate)+"'";
 		runSQLQuery(sql);
@@ -124,7 +124,7 @@ class DatabaseUtil {
 			// encrypting the journal entry
 			String cipherText = CryptUtil.encrypt(encryptionKey, entry);
 			long currentTime = System.currentTimeMillis(), entryTime = entryDate.getTimeInMillis();
-			
+
 			// pushing cipher to database
 			String entryDay = this.getSQLDateString(entryDate);
 			if(!entryExists) {
@@ -140,18 +140,18 @@ class DatabaseUtil {
 			closeConnection();
 		}
 	}
-	
+
 	JournalEntry getJournalEntry(String username, Calendar entryDate) throws Exception {
-		
+
 		JournalEntry entry = null;
-		
+
 		// retrieving the encryption key of the user
 		String encryptionKey = getEncryptionKey(username);
-		
+
 		if(encryptionKey != null) {
 			String cipherText = null;
 			Calendar lastEdited = Calendar.getInstance();
-			
+
 			// retrieving the cipher text from table
 			String entryDay = entryDate.get(Calendar.YEAR) + "-" + entryDate.get(Calendar.MONTH) + "-" + entryDate.get(Calendar.DAY_OF_MONTH);
 			String sql = "SELECT entry, last_edited FROM entries "
@@ -161,10 +161,10 @@ class DatabaseUtil {
 				while(resultSet.next()) {
 					cipherText = resultSet.getString(1);
 					lastEdited.setTimeInMillis(resultSet.getLong(2));
-					
+
 					System.out.println("Cipher Text: "+cipherText);
 				}
-				if(cipherText != null) { 
+				if(cipherText != null) {
 					String plainText = CryptUtil.decrypt(encryptionKey, cipherText);
 					entry = new JournalEntry(plainText, entryDate, lastEdited);
 					System.out.println("Plain Text : "+ plainText);
@@ -176,23 +176,23 @@ class DatabaseUtil {
 		}
 		return entry;
 	}
-	
+
 	void addNewUser(User newUser) throws SQLException {
 		String u, p, q, a, k;
-		
+
 		u = newUser.getUsername();
 		p = CryptUtil.sha256(newUser.getPassword());
 		q = newUser.getQuestion();
 		a = newUser.getAnswer();
 		k = newUser.getEncryptionKey();
-		
+
 		String sql = "INSERT INTO "+this.LOGIN_TABLE+
 				" (username, password, question, answer, enckey) VALUES" +
 				"('"+u+"', '"+p+"', '"+q+"', '"+a+"', '"+k+"')";
-		
+
 		runSQLQuery(sql);
 	}
-	
+
 	boolean usernameExists(String username) throws Exception {
 		String sql = "SELECT * FROM "+this.LOGIN_TABLE+" WHERE username='"+username+"'";
 		boolean exists = false;
@@ -203,24 +203,24 @@ class DatabaseUtil {
 		closeConnection();
 		return exists;
 	}
-	
+
 	void updateUser(User user) throws SQLException {
 		String u, p, q, a, k;
-		
+
 		u = user.getUsername();
 		p = CryptUtil.sha256(user.getPassword());
 		q = user.getQuestion();
 		a = user.getAnswer();
 		k = user.getEncryptionKey();
-		
-		String sql = "UPDATE " + this.LOGIN_TABLE + 
+
+		String sql = "UPDATE " + this.LOGIN_TABLE +
 				" SET password = '" + p + "', question = '" + q + "', answer = '" + a + "', enckey = '" + k +
 				"' WHERE username = '" + u + "'";
-		
+
 		runSQLQuery(sql);
 	}
-	
+
 	private String getSQLDateString(Calendar c) {
-		return c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DAY_OF_MONTH); 
+		return c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DAY_OF_MONTH);
 	}
 }
