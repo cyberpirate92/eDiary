@@ -67,7 +67,7 @@ public class DatabaseUtil {
 			resultSet.close();
 	}
 
-	boolean validateLogin(String username, String password) throws SQLException {
+	public boolean validateLogin(String username, String password) throws SQLException {
 		boolean loginSuccess = false;
 		runSQLQuery("SELECT COUNT(*) FROM users WHERE username='"+username+"' AND password='"+CryptUtil.sha256(password)+"'");
 		if(resultSet != null) {
@@ -103,7 +103,7 @@ public class DatabaseUtil {
 		return encryptionKey;
 	}
 
-	void saveJournalEntry(String username, String entry, Calendar entryDate) throws SQLException {
+	public void saveJournalEntry(String username, String entry, Calendar entryDate) throws SQLException {
 
 		// retrieving the encryption key of the user
 		String encryptionKey = getEncryptionKey(username);
@@ -141,7 +141,7 @@ public class DatabaseUtil {
 		}
 	}
 
-	JournalEntry getJournalEntry(String username, Calendar entryDate) throws Exception {
+	public JournalEntry getJournalEntry(String username, Calendar entryDate) throws Exception {
 
 		JournalEntry entry = null;
 

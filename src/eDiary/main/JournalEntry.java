@@ -21,7 +21,7 @@ public class JournalEntry {
 		this.lastEdited = lastEdited;
 	}
 
-	String getEntry() {
+	public String getEntry() {
 		return entry;
 	}
 

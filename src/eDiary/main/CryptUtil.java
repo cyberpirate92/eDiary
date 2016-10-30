@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class CryptUtil {
-	static String encrypt(String key, String plainText) {
+	public static String encrypt(String key, String plainText) {
 
 		char appendChar;
 		if(plainText.length() % 2 == 0)
@@ -54,7 +54,7 @@ public class CryptUtil {
 		return cipherText + appendChar;
 	}
 
-	static String decrypt(String key, String cipherText) throws Exception {
+	public static String decrypt(String key, String cipherText) throws Exception {
 		char appendChar = cipherText.charAt(cipherText.length()-1);
 		cipherText = cipherText.substring(0, cipherText.length()-1);
 		String plainText = "";
