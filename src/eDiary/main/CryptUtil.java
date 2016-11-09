@@ -214,4 +214,40 @@ public class CryptUtil {
 	       throw new RuntimeException(ex);
 	    }
 	}
+	
+	public static String encryptString(String key, String plainText) {
+		String replacement = CryptUtil.encrypt(key, extractCharacters(plainText));
+		String cipherText = "";
+		for(int i=0, j=0; i<plainText.length(); i++) {
+			if(isEncryptable(plainText.charAt(i))) 
+				cipherText += replacement.charAt(j++);
+			else
+				cipherText += plainText.charAt(i);
+		}
+		return cipherText;
+	}
+	
+	public static String decryptString(String key, String cipherText) throws Exception {
+		String replacement = CryptUtil.decrypt(key, extractCharacters(cipherText));
+		String plainText = "";
+		for(int i=0, j=0; i<cipherText.length(); i++) {
+			if(isEncryptable(cipherText.charAt(i))) 
+				plainText += replacement.charAt(j++);
+			else
+				plainText += cipherText.charAt(i);
+		}
+		return plainText;
+	}
+	
+	public static String extractCharacters(String str) {
+		String s = "";
+		for(int i = 0 ; i < str.length() ; i++ )
+			if(isEncryptable(str.charAt(i)))
+				s += str.charAt(i);
+		return s;
+	}
+	
+	public static boolean isEncryptable(char c) {
+		return (c >= 'a' && c <= 'z') || (c >= 'A' && c<='Z');
+	}
 }

@@ -9,5 +9,12 @@ public class TestCryptUtil {
 		System.out.println("Cipher Text: " + cipherText);
 		String plainText = CryptUtil.decrypt(key, cipherText);
 		System.out.println("Plain Text: " + plainText);
+		
+		// encryptString method
+		String message1 = "A string with spaces and !@# special charsss.";
+		cipherText = CryptUtil.encryptString(key, message1);
+		System.out.println("Cipher Text: " + cipherText);
+		plainText = CryptUtil.decryptString(key, cipherText);
+		System.out.println("Plain Text: " + plainText);
 	}
 }
